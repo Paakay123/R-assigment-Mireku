@@ -1,0 +1,35 @@
+---
+title: "Nessel-Review"
+author: "Timothy Nessel"
+date: "10/15/2018"
+output: html_document
+---
+
+So it would be very helpful to use R markdown files with the code block capability.
+```{r}
+#Code goes here
+```
+
+This allows you to knit together the code blocks with your explanations and the output of the code. 
+
+####File Inspection
+It can be a good idea to seperate your code, output, and raw data into folders to prevent manipulating something important. 
+
+Using read.delim(file.choose(), header=T) works fine but you may also want to import the raw data files into your respository so that a known file is being used for the analysis. 
+
+####File Manipulation
+syntax error Line 69:
+```{r}
+snp_ID_chro_pos <- SNP_position[, c("SNP_ID", "Chromosome", "Position"
+```
+make sure you close those brackets
+
+Line 100-130
+Some fo your for loop variables have bit confusing names. This is a matter of preference though and not actually anything wrong.
+
+####Visualization
+The visualization section seems fine, but it is a bit hard to read. A bit more documentation and utilizing Rmd functionality would help. 
+
+
+####Overall
+Overall the code looks pretty tight, and what I ran did work. Though I only ran it in pieces and could have missed something. So my overall critique is to use Rmd code boxes and knitting. Or at least to have all your code in the R syntax in a seperate file that can be run all the way through. Otherwise, great job!
