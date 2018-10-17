@@ -2,48 +2,48 @@
 title: "R lesson"
 output: html_document
 # Data Load from my desktop
-Read data fang_et_at_genotypes AND SNP_position files
+Read data fang_et_al and SNP_position files
 
-Genotype<-read.delim(file.choose(), header=T)
 SNPs<-read.delim(file.choose(),header = T)
 fang_et_al<read.delim(file.choose(),header =T)
 
 
 #DATA INSPECTION:
 head() to inspect the files. 
-head(Genotypes, 2, n=5)
-head(SNP_position, n=5)
+head(fang_et_al, 2, n=5)
+head(SNPs, n=5)
 Both files are structured as a list
-typeof(Genotype)
+typeof(fang_et_al)
 typeof(SNPs)
 
-Equally we have that both files are a data.frame according to the function class. For Genotype file we have all variables as factors, while for SNP_position we have some variables as a integer.
+Equally we have that both files are a data.frame according to the function class. For Genotype file we have all variables as factors, while for SNPs we have some variables as a integer.
 
-class(Genotype)
+class(fang_et_al)
 class(SNPs)
-str(Genotype)
+str(fang_et_al)
 str(SNPs)
 
 The Genotype file has 2782 number of rows and 986 number of columns, while the SNP_position has 983 rows with 15 columns.
-dim(Genotype)
+dim(fang_et_al)
 dim(SNPs)
 
 The name of each column per file is given by colnames function.
-colnames(Genotype)
+colnames(fang_et_al)
 colnames(SNPs)
 
 Use the levels() function to investigate the levels.
 levels(SNPs$Chromosome)
-levels(Genotype$Group)
+levels(fang_et_al$Group)
 
 ### DATA PROCESSING
 
 #SPLIT DATA INTO GROUPS
-maize <- subset(Genotypes, Group == "ZMMIL" | Group == "ZMMLR" | Group =="ZMMMR")
+maize <- subset(fang_et_al, Group == "ZMMIL" | Group == "ZMMLR" | Group =="ZMMMR")
 
-teosinte <- subset(Genotypes, Group == "ZMPBA" | Group == "ZMPIL" | Group == "ZMPJA")
+teosinte <- subset(fang_et_al, Group == "ZMPBA" | Group == "ZMPIL" | Group == "ZMPJA")
 
-tripsacum <- subset(Genotypes, !Group == "ZMPBA" & !Group == "ZMPIL" & !Group == "ZMPJA" & !Group == "ZMMIL" & !Group == "ZMMLR" & !Group=="ZMMMR") The results shows the total number of lines in the three files is the same as the totla number in the original file.
+tripsacum <- subset(fang_et_al, !Group == "ZMPBA" & !Group == "ZMPIL" & !Group == "ZMPJA" & !Group == "ZMMIL" & !Group == "ZMMLR" & !Group=="ZMMMR") 
+The results shows the total number of lines in the three files is the same as the totla number in the original file.
 
 ####Data transposing
 The t function can be used to transpose data
@@ -65,10 +65,10 @@ transposed_teosinte <- transposed_teosinte[-1,]
 transposed_maize <- rownames_to_column(transposed_maize, var="SNP_ID")
 transposed_teosinte <- rownames_to_column(transposed_teosinte, var="SNP_ID")
 
-In the data.frame snp_position the column 3 is for chromosome, the position of the chromosome is the column 4, while the column 1 (SNP_ID) is the common column with the transposed files. Then, we proceed to create a new file with only the information required from the snp_position.txt file:
-snp_ID_chro_pos <- SNP_position[, c("SNP_ID", "Chromosome", "Position"
+In the data.frame SNPs, the column 3 is for chromosome, the position of the chromosome is the column 4, while the column 1 (SNP_ID) is the common column with the transposed files. Then, we proceed to create a new file with only the information required from the snp_position.txt file:
+snp_ID_chro_pos <- SNP_position[, c("SNP_ID", "Chromosome", "Position")]
 
-Once we have the new data.frame we proceed to order the data.frames of the transposed files as follows:
+Once we have the new data.frame, the data.frames are put into order of the transposed files as follows:
 if(!require("dplyr")) install.packages("dplyr")
 library(dplyr)
 
@@ -76,7 +76,7 @@ transposed_teosinte <- arrange(transposed_teosinte, SNP_ID)
 transposed_maize <- arrange(transposed_maize, SNP_ID) 
 snp_ID_chro_pos <- arrange(snp_ID_chro_pos, SNP_ID) 
 
-The files are sorted by snp_ID, therefore the SNP POSITION and chromosome can be joined to it.
+The files are sorted by snp_ID, therefore the SNPs and chromosome can be joined to it.
 
 teosinte_all_join <- merge(snp_ID_chro_pos,transposed_teosinte, by.x="SNP_ID", by.y="SNP_ID", all = TRUE)
 
@@ -87,12 +87,13 @@ teosinte_all_join <- subset(teosinte_all_join, !(teosinte_all_join$Chromosome ==
 
 maize_all_join <- subset(maize_all_join, !(maize_all_join$Chromosome == "unknown") | !(maize_all_join$Chromosome == "multiple"))
 
-After the two uninformative columns are removed,each dataframe is sorted out by position in an ascending order. Different from UNIX here we do not have to have in order the chromosomes to be able to extract the information. Sorting by position will give us after the split a new files with the position sorted in an ascending order.
+After the two uninformative columns are removed,each dataframe is sorted out by position in an ascending order. Different from UNIX here we do not need to have them in order to be able to extract the information. Sorting by position will produce a new file with the position sorted in an ascending order.
 
 teosinte_all_join <- arrange(teosinte_all_join, Position)
 maize_all_join <- arrange(maize_all_join, Position)
 
 # creating a loop to create 10 files per chromosome
+
 teosinte_split <- split(teosinte_all_join, teosinte_all_join$Chromosome)
 nom <- names(teosinte_split)
 for(myname in nom){
@@ -109,18 +110,19 @@ write.table(maize_split[[myname]], file = savename, quote = FALSE, sep = "\t", r
 
 Now, the default has the  missing command ? and has to be changed.
 # Replacing the missing code ? with - . 
-To do this, the data frame has to be ordered in a decreasing order and report that the values in the newd data fram are now characters in R.
+To do this, the data frame has to be ordered in a descending order and report that the values in the newd data fram are now characters in R.
 
 rev_teosinte_all_join <- arrange(teosinte_all_join, desc(Position))
 rev_maize_all_join <- arrange(maize_all_join, desc(Position))
 
+# Replacing ? with -
 rev_teosinte_all_join[] <- lapply(rev_teosinte_all_join, as.character)
 rev_teosinte_all_join[rev_teosinte_all_join == '?/?'] <- '-/-'
 
 rev_maize_all_join[] <- lapply(rev_maize_all_join, as.character)
 rev_maize_all_join[rev_maize_all_join == '?/?'] <- '-/-'
 
-After this is done, files per chromosome can be created.
+#After this is done, files per chromosome can be created.
 
 rev_teosinte_split <- split(rev_teosinte_all_join, rev_teosinte_all_join$Chromosome)
 nom <- names(rev_teosinte_split)
